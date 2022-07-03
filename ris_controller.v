@@ -4,107 +4,71 @@ module ris_controller(
   output         io_data_channel_ready,
   input          io_data_channel_valid,
   input  [255:0] io_data_channel_bits,
-  input          io_valid,
   output [31:0]  io_out_data,
   output         io_out_clk,
   output         io_out_le
 );
 `ifdef RANDOMIZE_REG_INIT
   reg [31:0] _RAND_0;
-  reg [31:0] _RAND_1;
+  reg [255:0] _RAND_1;
   reg [31:0] _RAND_2;
   reg [31:0] _RAND_3;
-  reg [255:0] _RAND_4;
-  reg [31:0] _RAND_5;
-  reg [31:0] _RAND_6;
 `endif // RANDOMIZE_REG_INIT
-  wire  _T_2 = ~reset; // @[ris.scala 34:31]
-  reg  out_data; // @[ris.scala 35:31]
-  reg  out_clk; // @[ris.scala 36:30]
-  reg  out_le; // @[ris.scala 37:29]
-  reg  ready; // @[ris.scala 38:28]
-  reg [255:0] data_reg; // @[ris.scala 47:31]
-  reg [2:0] value; // @[Counter.scala 62:40]
-  reg  state; // @[ris.scala 52:28]
-  wire  _GEN_0 = ready & io_data_channel_valid | state; // @[ris.scala 62:52 63:27 52:28]
-  wire [255:0] _data_reg_T = {{8'd0}, data_reg[255:8]}; // @[ris.scala 83:46]
-  wire  wrap = value == 3'h7; // @[Counter.scala 74:24]
-  wire [2:0] _value_T_1 = value + 3'h1; // @[Counter.scala 78:24]
-  wire  _GEN_4 = clock ? data_reg[248] : out_data; // @[ris.scala 35:31 77:39 80:38]
-  wire  _GEN_8 = wrap | ready; // @[ris.scala 89:61 92:27 38:28]
-  wire  _GEN_9 = state ? clock : out_clk; // @[ris.scala 53:22 76:29 36:30]
-  wire  _GEN_10 = state ? _GEN_4 : out_data; // @[ris.scala 53:22 35:31]
-  assign io_data_channel_ready = ready; // @[ris.scala 42:31]
-  assign io_out_data = {{31'd0}, out_data}; // @[ris.scala 39:21]
-  assign io_out_clk = out_clk; // @[ris.scala 40:20]
-  assign io_out_le = out_le; // @[ris.scala 41:19]
+  wire  _T_2 = ~reset; // @[ris.scala 18:31]
+  reg [30:0] out_data; // @[ris.scala 19:31]
+  reg [255:0] data_reg; // @[ris.scala 23:31]
+  reg [3:0] value; // @[Counter.scala 62:40]
+  reg [8:0] value_1; // @[Counter.scala 62:40]
+  wire  shift_clk = value_1 == 9'h0; // @[ris.scala 27:39]
+  wire  wrap = value_1 == 9'h1f3; // @[Counter.scala 74:24]
+  wire [8:0] _value_T_1 = value_1 + 9'h1; // @[Counter.scala 78:24]
+  wire  wrap_1 = value == 4'h8; // @[Counter.scala 74:24]
+  wire [3:0] _value_T_3 = value + 4'h1; // @[Counter.scala 78:24]
+  wire [255:0] _data_reg_T = {{1'd0}, data_reg[255:1]}; // @[ris.scala 38:38]
+  wire [8:0] _io_out_clk_T_1 = value_1 - 9'h1; // @[ris.scala 46:42]
+  wire  _io_out_clk_T_2 = _io_out_clk_T_1 > 9'hfa; // @[ris.scala 46:47]
+  assign io_data_channel_ready = 1'h1; // @[ris.scala 20:63]
+  assign io_out_data = {{1'd0}, out_data}; // @[ris.scala 19:62]
+  assign io_out_clk = value <= 4'h8 & value >= 4'h1 & _io_out_clk_T_1 > 9'hfa; // @[ris.scala 45:61 46:24 48:24]
+  assign io_out_le = value == 4'h0 & _io_out_clk_T_2; // @[ris.scala 50:38 51:23 53:23]
   always @(posedge clock or posedge _T_2) begin
-    if (_T_2) begin // @[ris.scala 53:22]
-      out_data <= 1'h0; // @[ris.scala 57:29]
-    end else begin
-      out_data <= ~state | _GEN_10;
-    end
-  end
-  always @(posedge clock or posedge _T_2) begin
-    if (_T_2) begin // @[ris.scala 53:22]
-      out_clk <= 1'h1; // @[ris.scala 58:29]
-    end else begin
-      out_clk <= ~state | _GEN_9;
-    end
-  end
-  always @(posedge clock or posedge _T_2) begin
-    if (_T_2) begin // @[ris.scala 37:29]
-      out_le <= 1'h0; // @[ris.scala 37:29]
-    end else begin
-      out_le <= io_data_channel_valid; // @[ris.scala 44:16]
-    end
-  end
-  always @(posedge clock or posedge _T_2) begin
-    if (_T_2) begin // @[ris.scala 53:22]
-      ready <= 1'h1; // @[ris.scala 62:52 69:27 38:28]
-    end else if (~state) begin // @[ris.scala 53:22]
-      if (ready & io_data_channel_valid) begin
-        ready <= 1'h0;
+    if (_T_2) begin // @[ris.scala 30:24]
+      out_data <= 31'h55aa55aa; // @[ris.scala 32:41 35:30 19:31]
+    end else if (shift_clk) begin // @[ris.scala 19:31]
+      if (value <= 4'h7) begin
+        out_data <= {{30'd0}, data_reg[248]};
       end
-    end else if (state) begin // @[ris.scala 38:28]
-      ready <= _GEN_8;
     end
   end
   always @(posedge clock or posedge _T_2) begin
-    if (_T_2) begin // @[ris.scala 53:22]
-      data_reg <= 256'h0; // @[ris.scala 62:52 65:30 47:31]
-    end else if (~state) begin // @[ris.scala 53:22]
-      if (ready & io_data_channel_valid) begin // @[ris.scala 77:39]
-        data_reg <= io_data_channel_bits; // @[ris.scala 83:34]
-      end
-    end else if (state) begin // @[ris.scala 47:31]
-      if (clock) begin
+    if (_T_2) begin // @[ris.scala 30:24]
+      data_reg <= 256'h0; // @[ris.scala 32:41 38:26 39:48 40:26 23:31]
+    end else if (shift_clk) begin // @[ris.scala 23:31]
+      if (value <= 4'h7) begin
         data_reg <= _data_reg_T;
+      end else if (wrap_1) begin
+        data_reg <= io_data_channel_bits;
       end
     end
   end
   always @(posedge clock or posedge _T_2) begin
-    if (_T_2) begin // @[ris.scala 53:22]
-      value <= 3'h0; // @[ris.scala 62:52 Counter.scala 99:11 62:40]
-    end else if (~state) begin // @[ris.scala 53:22]
-      if (ready & io_data_channel_valid) begin // @[ris.scala 77:39]
-        value <= 3'h0; // @[Counter.scala 78:15]
-      end
-    end else if (state) begin // @[Counter.scala 62:40]
-      if (clock) begin
-        value <= _value_T_1;
+    if (_T_2) begin // @[ris.scala 30:24]
+      value <= 4'h0; // @[Counter.scala 78:15 88:{20,28}]
+    end else if (shift_clk) begin // @[Counter.scala 62:40]
+      if (wrap_1) begin
+        value <= 4'h0;
+      end else begin
+        value <= _value_T_3;
       end
     end
   end
   always @(posedge clock or posedge _T_2) begin
-    if (_T_2) begin // @[ris.scala 53:22]
-      state <= 1'h0;
-    end else if (~state) begin // @[ris.scala 53:22]
-      state <= _GEN_0; // @[ris.scala 89:61 90:27 52:28]
-    end else if (state) begin // @[ris.scala 52:28]
-      if (wrap) begin
-        state <= 1'h0;
-      end
+    if (_T_2) begin // @[Counter.scala 88:20]
+      value_1 <= 9'h0; // @[Counter.scala 88:28]
+    end else if (wrap) begin // @[Counter.scala 78:15]
+      value_1 <= 9'h0;
+    end else begin
+      value_1 <= _value_T_1;
     end
   end
 // Register and memory initialization
@@ -144,40 +108,25 @@ initial begin
     `endif
 `ifdef RANDOMIZE_REG_INIT
   _RAND_0 = {1{`RANDOM}};
-  out_data = _RAND_0[0:0];
-  _RAND_1 = {1{`RANDOM}};
-  out_clk = _RAND_1[0:0];
+  out_data = _RAND_0[30:0];
+  _RAND_1 = {8{`RANDOM}};
+  data_reg = _RAND_1[255:0];
   _RAND_2 = {1{`RANDOM}};
-  out_le = _RAND_2[0:0];
+  value = _RAND_2[3:0];
   _RAND_3 = {1{`RANDOM}};
-  ready = _RAND_3[0:0];
-  _RAND_4 = {8{`RANDOM}};
-  data_reg = _RAND_4[255:0];
-  _RAND_5 = {1{`RANDOM}};
-  value = _RAND_5[2:0];
-  _RAND_6 = {1{`RANDOM}};
-  state = _RAND_6[0:0];
+  value_1 = _RAND_3[8:0];
 `endif // RANDOMIZE_REG_INIT
   if (_T_2) begin
-    out_data = 1'h0;
-  end
-  if (_T_2) begin
-    out_clk = 1'h1;
-  end
-  if (_T_2) begin
-    out_le = 1'h0;
-  end
-  if (_T_2) begin
-    ready = 1'h1;
+    out_data = 31'h55aa55aa;
   end
   if (_T_2) begin
     data_reg = 256'h0;
   end
   if (_T_2) begin
-    value = 3'h0;
+    value = 4'h0;
   end
   if (_T_2) begin
-    state = 1'h0;
+    value_1 = 9'h0;
   end
   `endif // RANDOMIZE
 end // initial
