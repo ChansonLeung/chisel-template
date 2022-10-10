@@ -16,7 +16,7 @@ class ris_controller(freq:Int) extends Module{
     def risedge(v:Bool) =  v & !RegNext(v)
 
     withReset((!reset.asBool).asAsyncReset){
-        val out_data = RegInit(0x55AA55AA.U);    io.out_data := out_data
+        val out_data = RegInit(0.U);    io.out_data := out_data
         val ready = RegInit(true.B);    io.data_channel.ready := ready
 
         //shift data variable
@@ -31,9 +31,7 @@ class ris_controller(freq:Int) extends Module{
             shift_cnt.inc()
             when(shift_cnt.value <= 7.U){
                 //set data
-                for(i<-0 until 32){
-                    out_data := data_reg(i*8)
-                }
+                out_data := VecInit((0 until 32).map(i=>data_reg(8*i))).asUInt
                 //shift bits
                 data_reg := data_reg >> 1.U
             }.elsewhen(shift_cnt.value === 8.U){
@@ -55,53 +53,6 @@ class ris_controller(freq:Int) extends Module{
 
 
 
-        // //state machine
-        // val idle::sending::Nil = Enum(2)
-        // val state = RegInit(idle)
-        // switch(state){
-        //     is(idle){
-        //         //idle
-        //         {
-        //             out_data:=0.U
-        //             out_clk :=0.U
-        //             // out_le := 1.U
-        //         }
-        //         //idle to sending
-        //         val last_valid = RegNext(io.data_channel.valid)
-        //         val valid_change = last_valid =/= io.data_channel.valid
-        //         when(ready & valid_change){
-        //             state := sending
-        //             //init data reg & shift counter
-        //             data_reg := io.data_channel.bits
-        //             shift_cnt.reset()
-
-        //             //lock data channel
-        //             ready := 0.U
-        //         }
-        //     }
-        //     is(sending){
-        //         //sending
-        //         {
-        //             out_clk := clock.asBool
-        //             when(clock.asBool){
-        //                 //set data
-        //                 for(i<-0 until 32){
-        //                     out_data := data_reg(i*8)
-        //                 }
-        //                 //shift bits
-        //                 data_reg := data_reg >> 8.U
-        //                 shift_cnt.inc()
-        //             }
-        //         }
-
-        //         //sending to idle
-        //         when(shift_cnt.value === (shift_cnt.n -1).U){
-        //             state := idle
-        //             //unlock data channel
-        //             ready := 1.U
-        //         }
-        //     }
-        // }
     }
 }
 

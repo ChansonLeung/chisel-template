@@ -15,7 +15,7 @@ module ris_controller(
   reg [31:0] _RAND_3;
 `endif // RANDOMIZE_REG_INIT
   wire  _T_2 = ~reset; // @[ris.scala 18:31]
-  reg [30:0] out_data; // @[ris.scala 19:31]
+  reg [31:0] out_data; // @[ris.scala 19:31]
   reg [255:0] data_reg; // @[ris.scala 23:31]
   reg [3:0] value; // @[Counter.scala 62:40]
   reg [8:0] value_1; // @[Counter.scala 62:40]
@@ -24,25 +24,33 @@ module ris_controller(
   wire [8:0] _value_T_1 = value_1 + 9'h1; // @[Counter.scala 78:24]
   wire  wrap_1 = value == 4'h8; // @[Counter.scala 74:24]
   wire [3:0] _value_T_3 = value + 4'h1; // @[Counter.scala 78:24]
-  wire [255:0] _data_reg_T = {{1'd0}, data_reg[255:1]}; // @[ris.scala 38:38]
-  wire [8:0] _io_out_clk_T_1 = value_1 - 9'h1; // @[ris.scala 46:42]
-  wire  _io_out_clk_T_2 = _io_out_clk_T_1 > 9'hfa; // @[ris.scala 46:47]
+  wire [7:0] out_data_lo_lo = {data_reg[56],data_reg[48],data_reg[40],data_reg[32],data_reg[24],data_reg[16],data_reg[8]
+    ,data_reg[0]}; // @[ris.scala 34:73]
+  wire [15:0] out_data_lo = {data_reg[120],data_reg[112],data_reg[104],data_reg[96],data_reg[88],data_reg[80],data_reg[
+    72],data_reg[64],out_data_lo_lo}; // @[ris.scala 34:73]
+  wire [7:0] out_data_hi_lo = {data_reg[184],data_reg[176],data_reg[168],data_reg[160],data_reg[152],data_reg[144],
+    data_reg[136],data_reg[128]}; // @[ris.scala 34:73]
+  wire [31:0] _out_data_T_32 = {data_reg[248],data_reg[240],data_reg[232],data_reg[224],data_reg[216],data_reg[208],
+    data_reg[200],data_reg[192],out_data_hi_lo,out_data_lo}; // @[ris.scala 34:73]
+  wire [255:0] _data_reg_T = {{1'd0}, data_reg[255:1]}; // @[ris.scala 36:38]
+  wire [8:0] _io_out_clk_T_1 = value_1 - 9'h1; // @[ris.scala 44:42]
+  wire  _io_out_clk_T_2 = _io_out_clk_T_1 > 9'hfa; // @[ris.scala 44:47]
   assign io_data_channel_ready = 1'h1; // @[ris.scala 20:63]
-  assign io_out_data = {{1'd0}, out_data}; // @[ris.scala 19:62]
-  assign io_out_clk = value <= 4'h8 & value >= 4'h1 & _io_out_clk_T_1 > 9'hfa; // @[ris.scala 45:61 46:24 48:24]
-  assign io_out_le = value == 4'h0 & _io_out_clk_T_2; // @[ris.scala 50:38 51:23 53:23]
+  assign io_out_data = out_data; // @[ris.scala 19:53]
+  assign io_out_clk = value <= 4'h8 & value >= 4'h1 & _io_out_clk_T_1 > 9'hfa; // @[ris.scala 43:61 44:24 46:24]
+  assign io_out_le = value == 4'h0 & _io_out_clk_T_2; // @[ris.scala 48:38 49:23 51:23]
   always @(posedge clock or posedge _T_2) begin
     if (_T_2) begin // @[ris.scala 30:24]
-      out_data <= 31'h55aa55aa; // @[ris.scala 32:41 35:30 19:31]
+      out_data <= 32'h0; // @[ris.scala 32:41 34:26 19:31]
     end else if (shift_clk) begin // @[ris.scala 19:31]
       if (value <= 4'h7) begin
-        out_data <= {{30'd0}, data_reg[248]};
+        out_data <= _out_data_T_32;
       end
     end
   end
   always @(posedge clock or posedge _T_2) begin
     if (_T_2) begin // @[ris.scala 30:24]
-      data_reg <= 256'h0; // @[ris.scala 32:41 38:26 39:48 40:26 23:31]
+      data_reg <= 256'h0; // @[ris.scala 32:41 36:26 37:48 38:26 23:31]
     end else if (shift_clk) begin // @[ris.scala 23:31]
       if (value <= 4'h7) begin
         data_reg <= _data_reg_T;
@@ -108,7 +116,7 @@ initial begin
     `endif
 `ifdef RANDOMIZE_REG_INIT
   _RAND_0 = {1{`RANDOM}};
-  out_data = _RAND_0[30:0];
+  out_data = _RAND_0[31:0];
   _RAND_1 = {8{`RANDOM}};
   data_reg = _RAND_1[255:0];
   _RAND_2 = {1{`RANDOM}};
@@ -117,7 +125,7 @@ initial begin
   value_1 = _RAND_3[8:0];
 `endif // RANDOMIZE_REG_INIT
   if (_T_2) begin
-    out_data = 31'h55aa55aa;
+    out_data = 32'h0;
   end
   if (_T_2) begin
     data_reg = 256'h0;
