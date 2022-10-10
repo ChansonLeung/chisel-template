@@ -7,17 +7,30 @@ import os.read
 
 class ris_controller(freq:Int) extends Module{
     val io = IO(new Bundle {
-        val data_channel = Flipped(Decoupled(UInt(256.W)))
+        // ris output
         val out_data = Output(UInt(32.W))
         val out_clk = Output(UInt(1.W))
         val out_le = Output(UInt(1.W))
+
+        // control register
+        val table_divider = Input(UInt(32.W))
+        val flip_divider = Input(UInt(32.W))
+        val table_cycle_num = Input(UInt(32.W))
+
+        //fifo
+        val fifo_tableid = Flipped(Decoupled(UInt(32.W)))
+        val fifo_phase = Flipped(Decoupled(UInt(32.W)))
+
+        //bram
+        val bram_addr = Output(UInt(8.W))
+        val bram_data = Input(UInt(256.W))
+        val bram_en = Output(UInt(1.W))
     })
 
     def risedge(v:Bool) =  v & !RegNext(v)
 
     withReset((!reset.asBool).asAsyncReset){
         val out_data = RegInit(0.U);    io.out_data := out_data
-        val ready = RegInit(true.B);    io.data_channel.ready := ready
 
         //shift data variable
         val data_reg = RegInit(0.U(256.W))
@@ -35,7 +48,7 @@ class ris_controller(freq:Int) extends Module{
                 //shift bits
                 data_reg := data_reg >> 1.U
             }.elsewhen(shift_cnt.value === 8.U){
-                data_reg := io.data_channel.bits
+                data_reg := io.bram_data
             }
         }
 
@@ -50,9 +63,6 @@ class ris_controller(freq:Int) extends Module{
         }.otherwise{
             io.out_le := 0.U
         }
-
-
-
     }
 }
 
